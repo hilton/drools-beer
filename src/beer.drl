@@ -1,0 +1,62 @@
+package com.lunatech.beer
+
+/*
+	Problem 1
+	05 October 2001
+
+	If we list all the natural numbers below 10 that are multiples of 3 or 5, we get 3, 5, 6 and 9. The sum of these multiples is 23.
+
+	Find the sum of all the multiples of 3 or 5 below 1000.
+*/
+
+/*
+	Solution
+	Note: the rules session starts with an initial set of at least 1000 NaturalNumber facts despite this not being most elegant,
+	in order to demonstrate inserting reference data into a rules session (this is more a Drools example than about Project Euler).
+*/
+
+import com.lunatech.Beer;
+import function com.lunatech.drools.RuleFunctions.log;
+
+
+declare Rejection
+    beer: Beer
+    reason: String
+end
+
+
+rule "Too pink"
+when
+	$beer: Beer(name matches ".*Kriek.*")
+then
+	insert(new Rejection($beer, "Cherry beer"));
+	log(drools, "Rejected ‘%s’", $beer.getName());
+end
+
+
+rule "Too fruity"
+when
+	$beer: Beer(name matches ".*Vrucht.*")
+then
+	insert(new Rejection($beer, "Fruit beer"));
+	log(drools, "Rejected ‘%s’", $beer.getName());
+end
+
+
+rule "Verboden Vrucht is not a fruit beer"
+when
+	$rejection: Rejection(beer.name matches ".*Verboden Vrucht")
+then
+	retract($rejection);
+	log(drools, "Rescued Verboden Vrucht");
+end
+
+
+rule "Too strong"
+when
+	$beer: Beer(strength >= 10.0)
+then
+	insert(new Rejection($beer, "Too strong"));
+	log(drools, "Rejected ‘%s’", $beer.getName());
+end
+
